@@ -8,6 +8,7 @@ using System.Web.Mvc;
 
 namespace MusicStore.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class StoreManagerController : Controller
     {
         private readonly MusicStoreEntities db = new MusicStoreEntities();
