@@ -29,6 +29,8 @@ namespace MusicStore.Controllers
             {
                 if (Membership.ValidateUser(model.UserName, model.Password))
                 {
+                    MigrateShoppingCart(model.UserName);
+
                     FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
                     if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
                         && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
@@ -82,6 +84,8 @@ namespace MusicStore.Controllers
 
                 if (createStatus == MembershipCreateStatus.Success)
                 {
+                    MigrateShoppingCart(model.UserName);
+
                     FormsAuthentication.SetAuthCookie(model.UserName, false /* createPersistentCookie */);
                     return RedirectToAction("Index", "Home");
                 }
@@ -188,5 +192,14 @@ namespace MusicStore.Controllers
             }
         }
         #endregion
+
+        private void MigrateShoppingCart(string UserName)
+        {
+            // Associate shopping cart items with logged in ser
+            var cart = ShoppingCart.GetCart(this.HttpContext);
+
+            cart.MigrateCart(UserName);
+            Session[ShoppingCart.CartSessionKey] = UserName;
+        }
     }
 }
